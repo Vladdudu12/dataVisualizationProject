@@ -4,46 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        body {
-        font-family: 'Open Sans', sans-serif;
-        }
+    <link rel="stylesheet" href="styles.css">
 
-        .graph .labels.x-labels {
-        text-anchor: middle;
-        }
-
-        .graph .labels.y-labels {
-        text-anchor: end;
-        }
-
-        .graph {
-        height: 500px;
-        width: 800px;
-        }
-
-        .graph .grid {
-        stroke: #ccc;
-        stroke-dasharray: 0;
-        stroke-width: 1;
-        }
-
-        .labels {
-        font-size: 13px;
-        }
-
-        .label-title {
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 12px;
-        fill: black;
-        }
-
-        .data {
-        fill: red;
-        stroke-width: 1; 
-        }
-    </style>
 </head>
 <body onload="initLists()">
     <!-- lista de țări este: BE, BG, CZ, DK, DE, EE, IE, EL, ES, FR, HR, IT, CY, LV, LT, LU, HU, MT, NL, AT, PL, PT, RO, SI, SK, FI, SE  -->
@@ -55,6 +17,7 @@
     <!-- <input type="button" name="btnFilter" onClick="filterDataset" -->
     <input type="button" name="btnFilter" id="btnFilter" onclick='filterButton()' value="Filtrare">
     
+    <br/>
 
     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graph" aria-labelledby="title" role="img">
         <title id="title">A line chart showing some information</title>

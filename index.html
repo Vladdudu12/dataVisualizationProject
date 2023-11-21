@@ -14,12 +14,34 @@
     <!-- PIB pe cap de locuitor/ Speranta Viata / Populatie pentru țările UE pentru ultimii 15 ani  -->
     <!-- PIB, POP, SV-->
     <select name="selectIndicator" id="selectIndicator"></select>
+
     <!-- <input type="button" name="btnFilter" onClick="filterDataset" -->
     <input type="button" name="btnFilter" id="btnFilter" onclick='filterButton()' value="Filtrare">
-    
+
+    <select name="selectYear" id="selectYear"></select>
+
+    <input type="button" name="btnFilter" id="btnFilterYear" onclick='filterYearButton()' value="Filtrare An">
+
+
+    <br>
+    <table>
+        <thead>
+            <th>PIB pe cap de locuitor</th>
+            <th>Speranta de Viata</th>
+            <th>Populatie</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>CEva</td>
+                <td>Altceva</td>
+                <td>Hello</td>
+            </tr>
+        </tbody>
+    </table>
+
     <br/>
 
-    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graph" aria-labelledby="title" role="img">
+    <!-- <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graph" aria-labelledby="title" role="img">
         <title id="title">A line chart showing some information</title>
 
         <g class="grid x-grid" id="xGrid">
@@ -54,7 +76,7 @@
             <circle cx="531" cy="200" data-value="6.8" r="3"></circle>
             <circle cx="677" cy="104" data-value="6.7" r="3"></circle>
         </g>
-    </svg>
+    </svg> -->
     
     <script type="text/javascript" src="index.js"></script>
 
@@ -69,6 +91,7 @@
         function init() {
             populateIndicatorList();
             populateCountryList();
+            populateYearList();
         }
 
 
@@ -100,8 +123,26 @@
                 })
             }
         }
+
+        function populateYearList() {
+            let selectYearElement = document.getElementById("selectYear");
+
+            if(selectYearElement !== null) {
+                for(let i = 0; i <= 23; i++) {
+                    selectYearElement.innerHTML += `<option value='${2023-i}'>${2023-i}</option>`
+                }
+            }
+        }
     
     
+        function filterYearButton() {
+            let selectYearElement = document.getElementById("selectYear");
+            let year = selectYearElement.value;
+            console.log(year);
+
+            console.log(filterDatasetByYear(year));
+        }
+
         function filterButton() {
             let selectCountryElement = document.getElementById("selectCountry");
             let selectIndicatorElement = document.getElementById("selectIndicator");
@@ -110,7 +151,7 @@
             let indicator = selectIndicatorElement.value;
             // console.log(indicator);
             // console.log(country);
-            console.log(filterDataset(country, indicator));
+            console.log(filterDatasetByCountryAndIndicator(country, indicator));
         }
     </script>
 </body>

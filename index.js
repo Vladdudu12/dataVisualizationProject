@@ -7,7 +7,11 @@ fetch("./media/eurostat.json")
     dataset = data;
     console.log(dataset)
 });
-function filterDataset(countryID, indicator){
+function filterDatasetByCountryAndIndicator(countryID, indicator){
     return dataset.filter(x => x.tara === countryID && x.indicator === indicator);
+}
+
+function filterDatasetByYear(year) {
+    return dataset.filter(x => x.an === year);
 }
 

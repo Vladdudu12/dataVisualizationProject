@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 
 </head>
-<body onload="initLists()">
+<body onload="init()">
     <!-- lista de țări este: BE, BG, CZ, DK, DE, EE, IE, EL, ES, FR, HR, IT, CY, LV, LT, LU, HU, MT, NL, AT, PL, PT, RO, SI, SK, FI, SE  -->
     <select name="selectCountry" id="selectCountry"></select>
 
@@ -43,7 +43,7 @@
             <text x="80" y="373">0</text>
             <text x="50" y="200" class="label-title">Price</text>
         </g>
-        <g class="data" data-setname="Our first data set">
+        <g class="data" data-setname="Our first data set" id="grupDate">
             <line x1="90" y1="192" x2="240" y2="141" stroke-width="1" stroke="blue"/>
             <line x1="240" y1="141" x2="388" y2="179" stroke-width="1" stroke="blue"/>
             <line x1="388" y1="179" x2="531" y2="200" stroke-width="1" stroke="blue"/>
@@ -56,29 +56,19 @@
         </g>
     </svg>
     
+    <script type="text/javascript" src="index.js"></script>
+
     <script>
 
-        let dataset;
-        function filterDataset(countryID, indicator){
-            return dataset.filter(x => x.tara === countryID && x.indicator === indicator);
-        }
+        // function filterDataset(countryID, indicator){
+        //     return dataset.filter(x => x.tara === countryID && x.indicator === indicator);
+        // }
 
-    
-        function populateDataset() {
-            fetch("./media/eurostat.json")
-                .then((res) => {
-                    return res.json();
-                })
-                .then((data) => {
-                    dataset = data;
-                    console.log(dataset)
-                });
-        }
 
-        function initLists() {
+
+        function init() {
             populateIndicatorList();
             populateCountryList();
-            populateDataset();
         }
 
 
@@ -124,5 +114,4 @@
         }
     </script>
 </body>
-<!-- <script src="index.js"></script> -->
 </html>

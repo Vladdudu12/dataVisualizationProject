@@ -8,10 +8,36 @@
 
     <script type="text/javascript" src="index.js"></script>
     <script>
+        let paginaHome;
+        let paginaIndicator;
+        let paginaAn;
+
         function init() {
+            paginaHome = document.getElementById("homePage")
+            paginaIndicator = document.getElementById("filtrareIndicatorPage")
+            paginaAn = document.getElementById("filtrareAnPage")
+            loadPaginaHome();
             populateIndicatorList();
             populateCountryList();
             populateYearList();
+        }
+
+        function loadPaginaIndicatori() {
+            paginaHome.style.display = "none";
+            paginaAn.style.display = "none";
+            paginaIndicator.style.display = "block";
+        }
+
+        function loadPaginaAn() {
+            paginaHome.style.display = "none";
+            paginaAn.style.display = "block";
+            paginaIndicator.style.display = "none";
+        }
+
+        function loadPaginaHome() {
+            paginaHome.style.display = "flex";
+            paginaAn.style.display = "none";
+            paginaIndicator.style.display = "none";
         }
 
         function populateIndicatorList() {
@@ -48,8 +74,8 @@
             let selectYearElement = document.getElementById("selectYear");
 
             if(selectYearElement !== null) {
-                for(let i = 0; i <= 23; i++) {
-                    selectYearElement.innerHTML += `<option value='${2023-i}'>${2023-i}</option>`
+                for(let i = 0; i <= 22; i++) {
+                    selectYearElement.innerHTML += `<option value='${2022-i}'>${2022-i}</option>`
                 }
             }
         }
@@ -64,6 +90,8 @@
             let selectYearElement = document.getElementById("selectYear");
             let year = selectYearElement.value;
             let array = filterDatasetByYear(year);
+            array.sort((a,b) => sortObjectArray(a,b));
+            //console.log(array);
             resetTbody();
 
             let tableBody = document.querySelector("tbody");
@@ -71,8 +99,28 @@
 
             let sumaPIB = 0;
             let sumaSV = 0;
-            let sumaPop = 0;
-            //TODO: de sortat in functie de tara, si extras indicatori
+            let sumaPOP = 0;
+            for(let i = 0; i < array.length; i = i + 3) {
+                console.log(i + " " + array[i].tara + " " + array[i].indicator + " " + array[i].valoare);
+                console.log(i+1 + " " + array[i+1].tara + " " + array[i+1].indicator + " " + array[i+1].valoare);
+                console.log(i+2 + " " + array[i+2].tara + " " + array[i+2].indicator + " " + array[i+2].valoare);
+
+                sumaSV += array[i].valoare;    
+                sumaPIB += array[i+1].valoare;    
+                sumaPOP += array[i+2].valoare;    
+            }
+
+            let nrTari = array.length/3;
+            let mediePIB = sumaPIB / nrTari;
+            let medieSV = sumaSV / nrTari;
+            let mediePOP = sumaPOP / nrTari;
+
+            let mediePIBElement = document.getElementById('mediePIB');
+            mediePIBElement.innerHTML = Math.round(mediePIB * 100) / 100;
+            let medieSVElement = document.getElementById('medieSV');
+            medieSVElement.innerHTML = Math.round(medieSV * 100) / 100;
+            let mediePOPElement = document.getElementById('mediePOP');
+            mediePOPElement.innerHTML = Math.round(mediePOP * 100) / 100;
 
             array.sort((a, b) => sortObjectArray(a,b));
             for(let i = 0; i < array.length; i= i + 3) {
@@ -80,31 +128,39 @@
                 //TARA
                 let cell1 = row.insertCell(0);
                 cell1.innerHTML = `${array[i].tara}`;
-                
-                //2
+    
+                //1
                 //PIB
-                let cell2 = row.insertCell(1);
-                cell2.innerHTML = `${array[i+2].valoare}`;
-                sumaPIB += array[i+2].valoare;    
-                
+                let cell3 = row.insertCell(1);
+                cell3.innerHTML = `${array[i+1].valoare}`;
+                let raportPIB = array[i+1].valoare / mediePIB;
+                if(raportPIB > 1) raportPIB = 1;
+                cell3.style.background = `rgba(${256*(1-raportPIB)},${256*raportPIB},0,1)`;
+    
                 //0
                 //SPERANTA DE VIATA
-                let cell3 = row.insertCell(2);
-                cell3.innerHTML = `${array[i].valoare}`;
-                sumaSV += array[i].valoare;    
+                let cell2 = row.insertCell(2);
+                cell2.innerHTML = `${array[i].valoare}`;
                     
-                //1
+                let raportSV = array[i].valoare / medieSV;
+                if(raportSV > 1) raportSV = 1;
+                cell2.style.background = `rgba(${256*(1-raportSV)},${256*raportSV},0,1)`;
+                
+                //2
                 //POPULATIE
                 let cell4 = row.insertCell(3);
-                cell4.innerHTML = `${array[i+1].valoare}`;
-                sumaPop += array[i+1].valoare;    
+                cell4.innerHTML = `${array[i+2].valoare}`;
+
+                let raportPOP = array[i+2].valoare / mediePOP;
+                if(raportPOP > 1) raportPOP = 2;
+                cell4.style.background = `rgba(${256*(1-raportPOP)},${256*raportPOP},0,1)`;
+
             }
 
             console.log(array.length);
-            let nrTari = array.length/3;
 
-            console.log(`Suma PIB:${sumaPIB}; Suma SV:${sumaSV}; Suma Pop:${sumaPop}`);
-            console.log(`Medie PIB:${sumaPIB/nrTari}; Medie SV:${sumaSV/nrTari}; Medie Pop:${sumaPop/nrTari}`);
+            console.log(`Suma PIB:${sumaPIB}; Suma SV:${sumaSV}; Suma Pop:${sumaPOP}`);
+            console.log(`Medie PIB:${mediePIB}; Medie SV:${medieSV}; Medie POP:${mediePOP}`);
 
         }
 
@@ -177,12 +233,13 @@
             let yearOffset = Math.floor((960 - 40 * 2 - 20)/data.length);
             // console.log(yearOffset);
             const f = 500 / Math.max(...data.map(x=>x.valoare));
-            // console.log(f);
+            console.log(data[0].valoare * f);
+            console.log(data[1].valoare * f);
             for(let i = 0; i < data.length; i++) {
                 yearAxis.innerHTML += `<line x1="${40 + yearOffset * (i+1)}" y1="490" x2="${40 + yearOffset * (i+1)}" y2="510" stroke="black"/>`;
                 yearAxis.innerHTML += `<text x="${40 + yearOffset * (i+1) - 12.5}" y="520" font-size="0.7rem">${2000 + i}</text>`;
-                valuePoints.innerHTML += `<circle cx="${40 + yearOffset * (i+1)}" cy="${data[i].valoare * f * 0.8}" r="2" />`
-                valueText.innerHTML +=  `<text x="${40 + yearOffset * (i+1)}" y="${data[i].valoare * f * 0.79}" font-size="10">${data[i].valoare}</text>` 
+                valuePoints.innerHTML += `<circle cx="${40 + yearOffset * (i+1)}" cy="${520 - data[i].valoare * f * 0.25}" r="2" />`
+                valueText.innerHTML +=  `<text x="${40 + yearOffset * (i+1)}" y="${520 - data[i].valoare * f * 0.27}" font-size="10">${data[i].valoare}</text>` 
             }
             
 
@@ -193,7 +250,7 @@
                 const cx2 = valuePoints.childNodes[i+1].cx.animVal.value;
                 const cy2 = valuePoints.childNodes[i+1].cy.animVal.value;
                 // console.log(valuePoints.childNodes[i].cx.animVal.value);
-                // console.log(valuePoints.childNodes[i].cy.animVal.value);
+                // console.log(valuePoints.childNodes[i].cy.animVal.value); 
                 valueLines.innerHTML += `<line x1="${cx1}" x2="${cx2}" y1="${cy1}" y2="${cy2}" stroke="blue" stroke-width="1"/>`;
 
             }
@@ -208,86 +265,73 @@
     
 </head>
 <body>
-    <!-- lista de țări este: BE, BG, CZ, DK, DE, EE, IE, EL, ES, FR, HR, IT, CY, LV, LT, LU, HU, MT, NL, AT, PL, PT, RO, SI, SK, FI, SE  -->
-    <select name="selectCountry" id="selectCountry"></select>
+    <div class="nav">
+        <div class="nav_wrapper">
+            <ul>
+                <li><a href="javascript:loadPaginaHome();">Home</a></li>
+                <li><a href="javascript:loadPaginaIndicatori();">Filtrare Indicatori Tara</a></li>
+                <li><a href="javascript:loadPaginaAn();">Filtrare in functie de An</a></li>
+            </ul>        
+        </div>
+    </div>
+    <div class="content">
 
-    <!-- PIB pe cap de locuitor/ Speranta Viata / Populatie pentru țările UE pentru ultimii 15 ani  -->
-    <!-- PIB, POP, SV-->
-    <select name="selectIndicator" id="selectIndicator"></select>
+        <div class="home" id="homePage">
+            <h1>Proiect Vizualizare Date</h3>
+            <h2>Dumitrescu Vlad-Eduard</h2>
+            <h3>Grupa 1088 Seria C</h1>
+            <object class="pdfViewer" data="./Cerinte_Proiect_Multimedia.pdf" type="application/pdf" width="100%" height="500px">
+                <p>Unable to display PDF file. <a href="./Cerinte_Proiect_Multimedia.pdf">Download</a> instead.</p>
+            </object>
+        </div>
+        <div class="filtrareIndicator" id="filtrareIndicatorPage">
+            <!-- lista de țări este: BE, BG, CZ, DK, DE, EE, IE, EL, ES, FR, HR, IT, CY, LV, LT, LU, HU, MT, NL, AT, PL, PT, RO, SI, SK, FI, SE  -->
+            <select class="round" name="selectCountry" id="selectCountry"></select>
 
-    <!-- <input type="button" name="btnFilter" onClick="filterDataset" -->
-    <input type="button" name="btnFilter" id="btnFilter" onclick='filterButton()' value="Filtrare">
+            <!-- PIB pe cap de locuitor/ Speranta Viata / Populatie pentru țările UE pentru ultimii 15 ani  -->
+            <!-- PIB, POP, SV-->
+            <select class="round" name="selectIndicator" id="selectIndicator"></select>
+            <input type="button" class="styled" name="btnFilter" id="btnFilter" onclick='filterButton()' value="Filtrare">
 
-    <select name="selectYear" id="selectYear"></select>
+            <svg width="960px" height="540px">
+                <line x1="40" x2="40" y1="500" y2="40" stroke="black" stroke-width="2"/>
+                <line x1="40" x2="920" y1="500" y2="500" stroke="black" stroke-width="2"/>
+                <polyline points="30 50 40 40 50 50" stroke="black" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round"/>
+                <polyline points="910 490 920 500 910 510" stroke="black" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round"/>
+                <text x="10" y="520" font-weight="bold">O(0,0)</text>
+                <text x="480" y="535" font-weight="bold">Ani</text>
+                <text transform="translate(20, 300) rotate(-90)" font-weight="bold">Indicator</text>
+                
+                <g id="yearsAxis"></g>
+                <g id="valuePoints"></g>
+                <g id="valueLines"></g>
+                <g id="valueText"></g>
+            </svg>
+        </div>
 
-    <input type="button" name="btnFilter" id="btnFilterYear" onclick='filterYearButton()' value="Filtrare An">
-
-
-    <br>
-    <table id="table">
-        <thead>
-            <th>Tara</th>
-            <th>PIB pe cap de locuitor</th>
-            <th>Speranta de Viata</th>
-            <th>Populatie</th>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <br/>
+        <div class="filtrareAn"  id="filtrareAnPage">
+            <select class="round" name="selectYear" id="selectYear"></select>
+            
+            <input type="button" class="styled" name="btnFilter" id="btnFilterYear" onclick='filterYearButton()' value="Filtrare An">
     
-    <svg width="960px" height="540px">
-        <line x1="40" x2="40" y1="500" y2="40" stroke="black" stroke-width="2"/>
-        <line x1="40" x2="920" y1="500" y2="500" stroke="black" stroke-width="2"/>
-        <polyline points="30 50 40 40 50 50" stroke="black" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round"/>
-        <polyline points="910 490 920 500 910 510" stroke="black" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round"/>
-        <text x="10" y="520" font-weight="bold">O(0,0)</text>
-        <text x="480" y="535" font-weight="bold">Ani</text>
-        <text transform="translate(20, 300) rotate(-90)" font-weight="bold">Indicator</text>
-        
-        <g id="yearsAxis"></g>
-        <g id="valuePoints"></g>
-        <g id="valueLines"></g>
-        <g id="valueText"></g>
-
-    </svg>
-    <!-- <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graph" aria-labelledby="title" role="img">
-        <title id="title">A line chart showing some information</title>
-
-        <g class="grid x-grid" id="xGrid">
-            <line x1="90" x2="90" y1="5" y2="371"></line>
-        </g>
-        <g class="grid y-grid" id="yGrid">
-            <line x1="90" x2="705" y1="370" y2="370"></line>
-        </g>
-            <g class="labels x-labels">
-            <text x="100" y="400">2008</text>
-            <text x="246" y="400">2009</text>
-            <text x="392" y="400">2010</text>
-            <text x="538" y="400">2011</text>
-            <text x="684" y="400">2012</text>
-            <text x="400" y="440" class="label-title">Year</text>
-        </g>
-        <g class="labels y-labels">
-            <text x="80" y="15">15</text>
-            <text x="80" y="131">10</text>
-            <text x="80" y="248">5</text>
-            <text x="80" y="373">0</text>
-            <text x="50" y="200" class="label-title">Price</text>
-        </g>
-        <g class="data" data-setname="Our first data set" id="grupDate">
-            <line x1="90" y1="192" x2="240" y2="141" stroke-width="1" stroke="blue"/>
-            <line x1="240" y1="141" x2="388" y2="179" stroke-width="1" stroke="blue"/>
-            <line x1="388" y1="179" x2="531" y2="200" stroke-width="1" stroke="blue"/>
-            <line x1="531" y1="200" x2="677" y2="104" stroke-width="1" stroke="blue"/>
-            <circle cx="90" cy="192" data-value="7.2" r="3"></circle>
-            <circle cx="240" cy="141" data-value="8.1" r="3"></circle>
-            <circle cx="388" cy="179" data-value="7.7" r="3"></circle>
-            <circle cx="531" cy="200" data-value="6.8" r="3"></circle>
-            <circle cx="677" cy="104" data-value="6.7" r="3"></circle>
-        </g>
-    </svg> -->
-    
+            <br>
+            <table id="table">
+                <thead>
+                    <th>Tara</th>
+                    <th>PIB pe cap de locuitor</th>
+                    <th>Speranta de Viata</th>
+                    <th>Populatie</th>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                    <th>Medie</th>
+                    <th id="mediePIB">PIB pe cap de locuitor</th>
+                    <th id="medieSV">Speranta de Viata</th>
+                    <th id="mediePOP">Populatie</th>
+                </tfoot>
+            </table>
+        </div>
+    </div>    
 </body>
 </html>

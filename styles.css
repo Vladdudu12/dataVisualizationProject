@@ -8,6 +8,13 @@ thead, tfoot {
     background-color: lightblue;
 }
 
+svg {
+    border: 1px solid #333;
+}
+circle {
+    fill: red;
+}
+
     .graph .labels.x-labels {
     text-anchor: middle;
     }
